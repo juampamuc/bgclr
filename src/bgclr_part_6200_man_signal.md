@@ -139,8 +139,12 @@ In addition, if the signal was **not** due to `abort()` or `raise()`,
 the handler can't access any object with static or thread-storage
 duration unless it's lock-free.
 
-An exception is that you can assign to (but not read from!) a variable
-of type `volatile sig_atomic_t`.
+An exception is that you can assign to a variable of type `volatile
+sig_atomic_t`. The spec is unclear on if you can read from a variable of
+that type. I think you can safely do that, but the minute you decide to
+read and write that variable in your handler, you've opened up the
+possibility of a race condition. Probably best to just set it as a flag
+that the signal has occurred and let the outside world deal with it.
 
 It's up to the implementation, but the signal handler might be reset to
 `SIG_DFL` just before the handler is called.
